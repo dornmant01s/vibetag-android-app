@@ -12,10 +12,19 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
+ codex/review-codebase-and-fix-bugs-c6g2r3
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.os.VibrationAttributes
+import android.media.AudioAttributes
+import androidx.annotation.RequiresApi
+
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+ main
 import androidx.core.app.NotificationCompat
 
 class UnlockVibeService : Service() {
@@ -113,6 +122,11 @@ class UnlockVibeService : Service() {
         } else null
 
         if (Build.VERSION.SDK_INT >= 33) {
+codex/review-codebase-and-fix-bugs-c6g2r3
+            vibrateApi33(v, effect)
+        } else {
+            vibrateLegacy(v, effect, timings)
+
             val attrs = VibrationAttributes.Builder()
                 .setUsage(VibrationAttributes.USAGE_ALARM)
                 .build()
@@ -121,6 +135,7 @@ class UnlockVibeService : Service() {
         } else {
             if (effect != null) @Suppress("DEPRECATION") v.vibrate(effect)
             else @Suppress("DEPRECATION") v.vibrate(5000)
+ main
         }
         isVibrating = true
     }
@@ -129,4 +144,39 @@ class UnlockVibeService : Service() {
         vibrator?.cancel()
         isVibrating = false
     }
+ codex/review-codebase-and-fix-bugs-c6g2r3
+
+    @RequiresApi(33)
+    private fun vibrateApi33(v: Vibrator, effect: VibrationEffect?) {
+        val attrs = VibrationAttributes.Builder()
+            .setUsage(VibrationAttributes.USAGE_ALARM)
+            .build()
+        if (effect != null) {
+            v.vibrate(effect, attrs)
+        } else {
+            val oneShot = VibrationEffect.createOneShot(
+                5000, VibrationEffect.DEFAULT_AMPLITUDE
+            )
+            v.vibrate(oneShot, attrs)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun vibrateLegacy(
+        v: Vibrator,
+        effect: VibrationEffect?,
+        timings: LongArray,
+    ) {
+        if (effect != null) {
+            val attrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build()
+            v.vibrate(effect, attrs)
+        } else {
+            // Use the repeating pattern on devices below API 26
+            v.vibrate(timings, 1)
+        }
+    }
+
+ main
 }
