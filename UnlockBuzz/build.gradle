@@ -1,0 +1,6 @@
+plugins {
+  // Use stable, widely available plugin versions so the project can build in
+  // environments without access to very recent Android tooling releases.
+  id 'com.android.application' version '8.1.1' apply false
+  id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
+}
