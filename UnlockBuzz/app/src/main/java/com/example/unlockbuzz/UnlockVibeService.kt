@@ -116,7 +116,7 @@ class UnlockVibeService : Service() {
         if (Build.VERSION.SDK_INT >= 33) {
             vibrateApi33(v, effect)
         } else {
-            vibrateLegacy(v, effect)
+            vibrateLegacy(v, effect, timings)
         }
         isVibrating = true
     }
@@ -142,7 +142,16 @@ class UnlockVibeService : Service() {
     }
 
     @Suppress("DEPRECATION")
-    private fun vibrateLegacy(v: Vibrator, effect: VibrationEffect?) {
-        if (effect != null) v.vibrate(effect) else v.vibrate(5000)
+    private fun vibrateLegacy(
+        v: Vibrator,
+        effect: VibrationEffect?,
+        timings: LongArray,
+    ) {
+        if (effect != null) {
+            v.vibrate(effect)
+        } else {
+            // Use the repeating pattern on devices below API 26
+            v.vibrate(timings, 1)
+        }
     }
 }
