@@ -31,9 +31,8 @@ class MainActivity : AppCompatActivity() {
             reqNotifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        ensureIgnoreBatteryOptimizations()
-
         findViewById<Button>(R.id.btnStart).setOnClickListener {
+            ensureIgnoreBatteryOptimizations()
             ContextCompat.startForegroundService(
                 this, Intent(this, UnlockVibeService::class.java)
             )
@@ -57,7 +56,11 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                 data = Uri.parse("package:$packageName")
             }
-            startActivity(intent)
+            try {
+                startActivity(intent)
+            } catch (_: Exception) {
+                // Ignore if the settings activity cannot be launched
+            }
         }
     }
 }
