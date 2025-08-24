@@ -16,6 +16,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.os.VibrationAttributes
+import android.media.AudioAttributes
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 
@@ -148,7 +149,10 @@ class UnlockVibeService : Service() {
         timings: LongArray,
     ) {
         if (effect != null) {
-            v.vibrate(effect)
+            val attrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build()
+            v.vibrate(effect, attrs)
         } else {
             // Use the repeating pattern on devices below API 26
             v.vibrate(timings, 1)
